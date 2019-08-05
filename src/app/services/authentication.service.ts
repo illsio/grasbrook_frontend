@@ -26,8 +26,10 @@ export class AuthenticationService {
   }
 
   login(username, password) {
+    username = btoa(username);
+    password = btoa(password);
     return this.http
-      .post<any>(`http://localhost:4200/users/authenticate`, {
+      .post<any>(`https://cityio.media.mit.edu/users/authenticate`, {
         username,
         password
       })
