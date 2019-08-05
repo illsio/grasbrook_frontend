@@ -12,6 +12,7 @@ import { AlertService } from "./alert.service";
 export class AuthenticationService {
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
+  public auth_url = `https://cityio.media.mit.edu/users/authenticate`;
 
   constructor(private http: HttpClient,
               private alertService: AlertService) {
@@ -29,7 +30,7 @@ export class AuthenticationService {
     username = btoa(username);
     password = btoa(password);
     return this.http
-      .post<any>(`https://cityio.media.mit.edu/users/authenticate`, {
+      .post<any>(this.auth_url, {
         username,
         password
       })
