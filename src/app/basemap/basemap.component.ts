@@ -20,6 +20,7 @@ import { AppComponent } from "../app.component";
 import {AlertService} from "../services/alert.service";
 import {LocalStorageService} from "../services/local-storage.service";
 import {RestoreMessage} from "../dial/restore-message";
+import {first} from "rxjs/operators";
 
 @NgModule({
   imports: [BrowserModule, FormsModule],
@@ -567,9 +568,23 @@ export class BasemapComponent implements OnInit, AfterViewInit {
   }
 
   private saveCurrentChanges() {
-    // TODO: send data to cityIO
-    this.localStorageService.removeGrid();
-    this.alertService.success("Data saved", "");
+    let {gridLayer, currentSource} = this.getGridSource();
+    this.layerLoader.sendGridData(currentSource)
+      .pipe(first())
+      .subscribe(
+        data => {
+          if (data) {
+            this.alertService.success("Data saved", "");
+            this.localStorageService.removeGrid();
+          } else {
+            this.alertService.error("Saving data failed ", "");
+          }
+          // TODO: Should we show something indicating the saving process?
+          //this.loading = false;
+        },
+        error => {
+          //this.loading = false;
+        });
   }
 
   /*
