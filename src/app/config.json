@@ -42,6 +42,24 @@
       "addOnMapInitialisation": false
     },
     {
+      "id": "grid-test",
+      "displayName": "geojson-grid",
+      "showInLayerList": true,
+      "addOnMapInitialisation": true,
+      "metadata": "",
+      "type": "fill-extrusion",
+      "paint": {
+        "fill-extrusion-color": ["get", "color"],
+        "fill-extrusion-height": ["get", "height"],
+        "fill-extrusion-base": 0,
+        "fill-extrusion-opacity": 1
+      },
+      "source": {
+        "type": "geojson",
+        "data": "../assets/modules_json_backup/grid-tests/grid_margin_random_height.geojson"
+      }
+    },
+    {
       "id": "abmhh",
       "type": "circle",
       "displayName": "ABM Hamburg",
@@ -84,10 +102,10 @@
       "paint": {}
     },
     {
-      "id": "grid-test",
-      "displayName": "geojson-grid",
+      "id": "grid-test-renamed",
+      "displayName": "geojson-grid-renamed",
       "showInLayerList": true,
-      "addOnMapInitialisation": true,
+      "addOnMapInitialisation": false,
       "metadata": "",
       "type": "fill-extrusion",
       "paint": {
