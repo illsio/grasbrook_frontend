@@ -28,6 +28,76 @@ export class GridCell {
         }
     }
 
+    static string_of_enum(enumn, value)
+    {
+        for (var k in enumn)
+            if (enumn[k] == value) 
+                return k;
+        return null;
+    } 
+
+    static string_of_obj(objn, value)
+    {
+        let it = 0
+        for (var k in objn)
+        {
+            if(it == value) {
+                return k
+            }
+            it+=1
+        }
+        return null;
+    } 
+
+    public static featureToTypemap(feature)
+    {
+        let typeDefinition = {}
+
+        const properties = feature['properties'];
+        typeDefinition["id"] = properties["id"]
+        switch(properties["type"])
+        {
+            case BuildingType.building:
+                typeDefinition["type"] = this.string_of_enum(BuildingType,properties["type"])
+                typeDefinition["bld_numLevels"] = properties['height']
+                typeDefinition["bld_useGround"] = this.string_of_obj(BuildingUse, properties["bld_useGround"])
+                typeDefinition["bld_useUpper"] = this.string_of_obj(BuildingUse, properties["bld_useUpper"])
+                break;
+            case BuildingType.open_space:
+                typeDefinition["type"] = "open_space"
+                typeDefinition["os_type"] = this.string_of_obj(OpenSpaceType, properties['os_type'])
+                break;
+            case BuildingType.street:
+                typeDefinition["type"] = "street"
+                typeDefinition["str_speed"] = properties["str_speed"]
+                typeDefinition["str_numLanes"] = properties["str_numLanes"]
+                typeDefinition["str_bike"] = properties["str_bike"]
+                typeDefinition["str_stairs"] = properties["str_stairs"]
+                typeDefinition["str_ramp"] = properties["str_ramp"]
+                typeDefinition["str_elevator"] = properties["str_elevator"]
+                break;
+            default:
+                return {}
+        }
+        return typeDefinition
+        
+        /*
+        "base_height":0,
+        "bld_numLevels":10,
+        "bld_useGround":0,
+        "bld_useUpper":0,
+        "initial-color":"#A9A9A9",
+        "os_type":"#69F0AE",
+        "str_bike":true,
+        "str_elevator":false,
+        "str_numLanes":0,
+        "str_ramp":false,
+        "str_speed":50,
+        "str_stairs":false,
+        "type":0
+        */
+    }
+
     public static fillFeatureByGridCell(feature, gridCell: GridCell) {
         for (let key of Object.keys(gridCell)) {
             if (key === 'bld_numLevels') {

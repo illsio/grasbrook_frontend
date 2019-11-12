@@ -593,11 +593,8 @@ export class BasemapComponent implements OnInit, AfterViewInit {
     updateCityIOgridCell(feature){
         if( !this.cityio.table_data) { return }
         // get properties of changed features
-        let typeDefinition : any = new GridCell
-        GridCell.fillGridCellByFeature(typeDefinition, feature)
-        delete typeDefinition.isSelected
-        delete typeDefinition.rotation
-        delete typeDefinition.color
+        let typeDefinition = GridCell.featureToTypemap(feature)
+
         // find or create type in header
         let header = this.cityio.table_data["header"]
         let typeint = header["mapping"]["type"].findIndex(function(element){

@@ -37,6 +37,11 @@ export class CityIOService {
     );
   }
 
+  /**
+   * POSTs data to cityIO. CAREFUL - this can overwrite with invalid data!
+   * @param field the endpoint to post to. e.g. "grid" or "header"
+   * @param data the actual data to put there
+   */
   pushCityIOdata(field, data) {
     const postData = data
     const url = this.updateUrl + this.tableName + "/" + field
