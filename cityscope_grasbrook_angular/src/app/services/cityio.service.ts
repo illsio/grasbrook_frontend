@@ -9,7 +9,8 @@ import { catchError, tap } from "rxjs/operators";
 })
 export class CityIOService {
   baseUrl = "https://cityio.media.mit.edu/api/table/";
-  tableName = "grasbrook";
+  updateUrl = "https://cityio.media.mit.edu/api/table/update/";
+  tableName = "grasbrook_test";
   url = `${this.baseUrl}${this.tableName}`;
 
   table_data: any = null; // can be accessed by other components, this will always be updated
@@ -17,7 +18,7 @@ export class CityIOService {
   public mapPosition = new rxjs.BehaviorSubject({});
 
   constructor(private http: HttpClient) {
-    this.update = interval(1000);
+    this.update = interval(10000);
     this.update.subscribe(() => {
       this.fetchCityIOdata().subscribe();
     });
@@ -33,6 +34,16 @@ export class CityIOService {
         this.table_data = data;
       }),
       catchError(this.handleError("getMetadata"))
+    );
+  }
+
+  pushCityIOdata(field, data) {
+    const postData = data
+    const url = this.updateUrl + this.tableName + "/" + field
+    console.log("pushing to ",url)
+    this.http.post(url, postData).subscribe(
+      (response) => console.log(response),
+      (error) => console.log(error)
     );
   }
 

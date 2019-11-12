@@ -8,7 +8,7 @@ import {LngLat, LngLatBoundsLike, LngLatLike} from "mapbox-gl";
 import {GeoJSONSource} from "mapbox-gl";
 import {ConfigurationService} from "../services/configuration.service";
 import {LayerLoaderService} from "../services/layer-loader.service";
-// import { CityIOService } from "../services/cityio.service";
+import { CityIOService } from "../services/cityio.service";
 import {AuthenticationService} from "../services/authentication.service";
 import {MatBottomSheet, MatDialog} from "@angular/material";
 import {ExitEditorDialog} from "../menus/exit-editor/exit-editor-dialog";
@@ -21,6 +21,7 @@ import {AlertService} from "../services/alert.service";
 import {LocalStorageService} from "../services/local-storage.service";
 import {RestoreMessage} from "../menus/restore-message/restore-message";
 import {GridCell} from "../entities/cell";
+import { ConditionalExpr, ngModuleJitUrl } from '@angular/compiler';
 
 @NgModule({
     imports: [BrowserModule, FormsModule],
@@ -71,7 +72,8 @@ export class BasemapComponent implements OnInit, AfterViewInit {
     selectedGridCell: GridCell;
     menuOutput: GridCell;
 
-    constructor(// private cityio: CityIOService,
+    constructor(
+        private cityio: CityIOService,
         private layerLoader: LayerLoaderService,
         private config: ConfigurationService,
         private authenticationService: AuthenticationService,
@@ -550,9 +552,13 @@ export class BasemapComponent implements OnInit, AfterViewInit {
     }
 
     private saveCurrentChanges() {
-        // TODO: send data to cityIO
         this.localStorageService.removeGrid();
         this.alertService.success("Data saved", "");
+
+        console.log(this.cityio.table_data["grid"])
+        // TODO: convert getGridSource() JSON to cell array
+        // or change cityio.table_data["grid"] when editing features
+        this.cityio.pushCityIOdata("grid", this.cityio.table_data["grid"])
     }
 
     /*
@@ -584,6 +590,33 @@ export class BasemapComponent implements OnInit, AfterViewInit {
         this.isEditMenu = false;
     }
 
+    updateCityIOgridCell(feature){
+        if( !this.cityio.table_data) { return }
+        // get properties of changed features
+        let typeDefinition : any = new GridCell
+        GridCell.fillGridCellByFeature(typeDefinition, feature)
+        delete typeDefinition.isSelected
+        delete typeDefinition.rotation
+        delete typeDefinition.color
+        // find or create type in header
+        let header = this.cityio.table_data["header"]
+        let typeint = header["mapping"]["type"].findIndex(function(element){
+            // TODO: this is a really bad way to compare two objects!
+            let a = JSON.stringify(typeDefinition).split("").sort().join()
+            let b = JSON.stringify(element).split("").sort().join()
+            return a==b
+        })
+        if(typeint == -1) { 
+            // new type
+            typeint = header["mapping"]["type"].length 
+            header["mapping"]["type"][typeint] = typeDefinition
+            this.cityio.pushCityIOdata("header", header)
+        }
+        
+        let id = feature["id"]
+        console.log("write cell",id,"value",typeint)
+        this.cityio.table_data["grid"][id] = [typeint, 0] // TODO: this will be overwritten by the next cityIO.update
+    }
 
     clickMenuClose = e => {
         this.isEditMenu = false;
@@ -606,6 +639,8 @@ export class BasemapComponent implements OnInit, AfterViewInit {
                 }
 
                 feature.properties["isSelected"] = false;
+
+                this.updateCityIOgridCell(feature)
             }
         }
         gridLayer.setData(currentSource);
