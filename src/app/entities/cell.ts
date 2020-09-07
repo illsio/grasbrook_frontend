@@ -55,11 +55,11 @@ export class GridCell {
     }
 
     static bld_lvl_to_height(levels) {
-        return 4 + (levels - 1) * 2.6;
+        return 4 + (levels - 1) * 3.0;
     }
 
     static bld_height_to_lvls(height) {
-        return Math.floor((height - 4) / 2.6) + 1;
+        return Math.floor((height - 4) / 3.0) + 1;
     }
 
     public static featureToTypemap(feature) {
